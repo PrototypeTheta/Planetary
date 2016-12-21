@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "planetary",
+    "name": "Planetary",
+    "description": "Space travel mod",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "TheCodedOne"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
