@@ -112,47 +112,64 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     	prevPosZ = posZ;
     	
     	/**
+    	//Change throttle
     	throttle = 0F;
+    	
+    	//Change turn speeds
     	turnSpeed.x = 0F;
     	turnSpeed.y = 0F;
     	turnSpeed.z = 0F;
+    	
+    	//Translational thrusters
     	translate = new Vector3f(0,0,0);
+    	
+    	//Reset orientation
     	axes = new RotatedAxes(0,0,0);
     	*/
+    	
+    	fly();
+    }
+    
+    public void fly()
+    {
+    	//Apply rotations. Always rotate Yaw, then Pitch, then Roll.
     	axes.rotateLocalYaw(turnSpeed.x);
     	axes.rotateLocalPitch(-turnSpeed.y);
     	axes.rotateLocalRoll(turnSpeed.z);
-    	Vector3f axis = axes.getXAxis();
-    	axis.normalise();
-    	axes.rotateGlobalRoll(180F);
-    	Vector3f move = new Vector3f(throttle,0,0);    
-    	Vector3f.add(move, translate, move);
-    	move = axes.findLocalVectorGlobally(move);
-
+    	axes.rotateGlobalRoll(180F); //Rotate calculation by 180 degrees to account for upside down model
+    	Vector3f move = new Vector3f(throttle,0,0); //Velocity vector   
+    	Vector3f.add(move, translate, move); //Apply translational thrust
+    	move = axes.findLocalVectorGlobally(move); //Take our velocity vector and rotate it in line with our model
     	this.motionX = move.x;
     	this.motionY = move.y;
     	this.motionZ = move.z;
-    	axes.rotateGlobalRoll(-180F);
-    	
+    	axes.rotateGlobalRoll(-180F); //Rotate calculation back
+    	//Apply motion
     	this.posX += motionX;
     	this.posY += motionY;
     	this.posZ += motionZ;
-    	spawnExhaust();
+    	spawnExhaust(); //Spawn exhaust particles. May or may not need to reset motion vector
     	this.motionX = 0;
     	this.motionY = 0;
     	this.motionZ = 0;
     }
+    
     @SideOnly(Side.CLIENT)
     public void spawnExhaust()
     {
-    	axes.rotateGlobalRoll(180F);
+    	if(throttle == 0) return;
+    	axes.rotateGlobalRoll(180F); //Rotate calculation again
+    	//Define engine positions
     	Vector3f engine1 = new Vector3f(-150/16F, -24/16F, 24/16F);
-    	engine1 = axes.findLocalVectorGlobally(engine1);
     	Vector3f engine2 = new Vector3f(-150/16F, -24/16F, -24/16F);
+    	//Rotate engine positions in line with model orientation
     	engine2 = axes.findLocalVectorGlobally(engine2);
+    	engine1 = axes.findLocalVectorGlobally(engine1);
+    	//Define particle velocity
     	Vector3f a = new Vector3f(-throttle,(float)Math.random()*0.1, (float)Math.random()*0.1);
     	a = axes.findLocalVectorGlobally(a);
-    	axes.rotateGlobalRoll(-180F);
+    	axes.rotateGlobalRoll(-180F); //Rotate everything back
+    	//Spawn!
     	this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, posX + engine1.x, posY + engine1.y, posZ + engine1.z, a.x, a.y, a.z);
        	this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, posX + engine2.x, posY + engine2.y, posZ + engine2.z, a.x, a.y, a.z);
 
@@ -329,6 +346,7 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
         IN_FLIGHT
     }
     
+    //Possible flight models. Conventional and VTOL for atmospheric flight, SIDDOF for spaceflight
     public enum FlightMode {
     	CONVENTIONAL,
     	VTOL,
