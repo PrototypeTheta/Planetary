@@ -29,21 +29,21 @@ public class EntityFANGC extends EntitySpaceShip {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableBlend();
         Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(Planetary.MOD_ID, "textures/models/spaceship/FANGC.png"));
-        GlStateManager.translate(0, 0.5, -2);
+        //GlStateManager.translate(0, 0.5, -2);
         GlStateManager.scale(0.1, 0.1, 0.1);
         GlStateManager.rotate(180F, 1, 0, 0);
-        float dYaw = (axes.getYaw() - prevAxes.getYaw());
+        float dYaw = (axes.getYaw() - prevRotationYaw);
         for(; dYaw > 180F; dYaw -= 360F) {}
         for(; dYaw <= -180F; dYaw += 360F) {}
-        float dPitch = (axes.getPitch() - prevAxes.getPitch());
+        float dPitch = (axes.getPitch() - prevRotationPitch);
         for(; dPitch > 180F; dPitch -= 360F) {}
         for(; dPitch <= -180F; dPitch += 360F) {}
-        float dRoll = (axes.getRoll() - prevAxes.getRoll());
+        float dRoll = (axes.getRoll() - prevRotationRoll);
         for(; dRoll > 180F; dRoll -= 360F) {}
         for(; dRoll <= -180F; dRoll += 360F) {}
-        GL11.glRotatef(180F - prevAxes.getYaw() - dYaw * f1, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(prevAxes.getPitch() + dPitch * f1, 0.0F, 0.0F, 1.0F);
-		GL11.glRotatef(prevAxes.getRoll() + dRoll * f1, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef(180F - prevRotationYaw - dYaw * f1, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(prevRotationPitch + dPitch * f1, 0.0F, 0.0F, 1.0F);
+		GL11.glRotatef(prevRotationRoll + dRoll * f1, 1.0F, 0.0F, 0.0F);
         ModelFangC.MODEL.render(this, 0, 0, 0, 0, 0, 1.0f);
         GlStateManager.popMatrix();
     }

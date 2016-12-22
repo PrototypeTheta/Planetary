@@ -8,9 +8,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -40,6 +42,7 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     //Control variables;
     public float throttle = 0;
     public Vector3f turnSpeed = new Vector3f(0,0,0); //Yaw, Pitch, Roll
+    public float prevRotationRoll = 0;
     
     //Control boundaries
     public float maxThrottle = 1; 
@@ -53,7 +56,7 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     public EntitySpaceShip(World worldIn) {
         super(worldIn);
         axes = new RotatedAxes(0,0,0);
-        prevAxes = axes;
+        prevAxes = axes.clone();
     }
 
     @Nullable
@@ -100,7 +103,10 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     @Override
     public void onUpdate()
     {
-    	prevAxes = axes;
+    	this.prevRotationPitch = axes.getPitch();
+    	this.prevRotationYaw = axes.getYaw();
+    	this.prevRotationRoll = axes.getRoll();
+    	prevAxes = axes.clone();
     	prevPosX = posX;
     	prevPosY = posY;
     	prevPosZ = posZ;
@@ -113,9 +119,12 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     	translate = new Vector3f(0,0,0);
     	axes = new RotatedAxes(0,0,0);
     	*/
-    	axes.rotateGlobalYaw(turnSpeed.x);
-    	axes.rotateGlobalPitch(turnSpeed.y);
-    	axes.rotateGlobalRoll(turnSpeed.z);
+    	throttle = 0F;
+    	turnSpeed.y = 0F;
+    	turnSpeed.z = 10;
+    	axes.rotateLocalYaw(turnSpeed.x);
+    	axes.rotateLocalPitch(turnSpeed.y);
+    	axes.rotateLocalRoll(turnSpeed.z);
     	Vector3f axis = axes.getXAxis();
     	axis.normalise();
     	axes.rotateGlobalRoll(180F);
@@ -131,9 +140,25 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     	this.posX += motionX;
     	this.posY += motionY;
     	this.posZ += motionZ;
+    	spawnExhaust();
     	this.motionX = 0;
     	this.motionY = 0;
     	this.motionZ = 0;
+    }
+    @SideOnly(Side.CLIENT)
+    public void spawnExhaust()
+    {
+    	axes.rotateGlobalRoll(180F);
+    	Vector3f engine1 = new Vector3f(-150/16F, -24/16F, 24/16F);
+    	engine1 = axes.findLocalVectorGlobally(engine1);
+    	Vector3f engine2 = new Vector3f(-150/16F, -24/16F, -24/16F);
+    	engine2 = axes.findLocalVectorGlobally(engine2);
+    	Vector3f a = new Vector3f(-throttle + motionX,(float)Math.random()*0.1 + motionY, (float)Math.random()*0.1 + motionZ);
+    	a = axes.findGlobalVectorLocally(a);
+    	axes.rotateGlobalRoll(-180F);
+    	this.worldObj.spawnParticle(EnumParticleTypes.CLOUD, posX + engine1.x, posY + engine1.y, posZ + engine1.z, a.x, a.y, a.z);
+       	this.worldObj.spawnParticle(EnumParticleTypes.CLOUD, posX + engine2.x, posY + engine2.y, posZ + engine2.z, a.x, a.y, a.z);
+
     }
 
     //Don't bother with this, we want to use the rotation matrix to handle orientation
