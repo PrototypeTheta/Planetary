@@ -84,7 +84,7 @@ public abstract class EntitySpaceShip extends Entity {
     protected void applyYawToEntity(Entity entityToUpdate) {
         entityToUpdate.setRenderYawOffset(this.rotationYaw);
         float f = MathHelper.wrapDegrees(entityToUpdate.rotationYaw - this.rotationYaw);
-        float f1 = MathHelper.clamp(f, -105.0F, 105.0F);
+        float f1 = clamp(f, -105.0F, 105.0F);
         entityToUpdate.prevRotationYaw += f1 - f;
         entityToUpdate.rotationYaw += f1 - f;
         entityToUpdate.setRotationYawHead(entityToUpdate.rotationYaw);
@@ -120,6 +120,14 @@ public abstract class EntitySpaceShip extends Entity {
             this.motionZ += (double) (MathHelper.cos(this.rotationYaw * 0.017453292F) * f);
         }
     }
+    
+    //For some reason math.clamp won't work, so I made my own function with blackjack and hookers. -Proto
+    public float clamp(float var, float min, float max)
+    {
+    	if(var > max) var = max;
+    	if(var < min) var = min;
+    	return var;
+    }
 
     @Override
     protected boolean canFitPassenger(Entity passenger) {
@@ -143,7 +151,7 @@ public abstract class EntitySpaceShip extends Entity {
 
     @Override
     public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
-        if (!world.isRemote && !player.isSneaking())
+        if (!worldObj.isRemote && !player.isSneaking())
             player.startRiding(this);
         return true;
     }
