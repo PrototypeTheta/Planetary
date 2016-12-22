@@ -190,22 +190,7 @@ public enum OverlayHandler {
         for(Entity entity : world.loadedEntityList) {
             if (entity instanceof EntitySpaceShip) {
             	EntitySpaceShip entityShip = (EntitySpaceShip)entity;
-                GL11.glPushMatrix();  
-                float f1 = event.getPartialTicks();
-                float dYaw = (entityShip.axes.getYaw() - entityShip.prevAxes.getYaw());
-                for(; dYaw > 180F; dYaw -= 360F) {}
-                for(; dYaw <= -180F; dYaw += 360F) {}
-                float dPitch = (entityShip.axes.getPitch() - entityShip.prevAxes.getPitch());
-                for(; dPitch > 180F; dPitch -= 360F) {}
-                for(; dPitch <= -180F; dPitch += 360F) {}
-                float dRoll = (entityShip.axes.getRoll() - entityShip.prevAxes.getRoll());
-                for(; dRoll > 180F; dRoll -= 360F) {}
-                for(; dRoll <= -180F; dRoll += 360F) {}
-                GL11.glRotatef(180F - entityShip.prevAxes.getYaw() - dYaw * f1, 0.0F, 1.0F, 0.0F);
-                GL11.glRotatef(entityShip.prevAxes.getPitch() + dPitch * f1, 0.0F, 0.0F, 1.0F);
-        		GL11.glRotatef(entityShip.prevAxes.getRoll() + dRoll * f1, 1.0F, 0.0F, 0.0F);
-                ((EntitySpaceShip) entity).render();
-                GL11.glPopMatrix();
+                ((EntitySpaceShip) entity).render(event.getPartialTicks());
             }
         }
         Minecraft.getMinecraft().entityRenderer.disableLightmap();

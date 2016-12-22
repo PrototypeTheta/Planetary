@@ -16,8 +16,7 @@ public class PlanetaryContent {
         CHEST = new ItemSpaceSuit(0, EntityEquipmentSlot.CHEST);
         LEGS = new ItemSpaceSuit(0, EntityEquipmentSlot.LEGS);
         FEET = new ItemSpaceSuit(0, EntityEquipmentSlot.FEET);
-
-        EntityRegistry.registerModEntity(EntityFANGC.class,"fangc", 0, Planetary.INSTANCE, 16, 20, true);
+        EntityRegistry.registerModEntity(EntityFANGC.class,"fangc", 0, Planetary.INSTANCE, 256, 1, true);
     }
 
 }

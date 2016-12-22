@@ -100,10 +100,10 @@ public class ModelShip extends ModelBase {
         render(pitchFlapRightModel);
         render(pitchFlapLeftWingModel);
         render(pitchFlapRightWingModel);
-        render(bodyWheelModel);
+        //render(bodyWheelModel);
         render(tailWheelModel);
-        render(leftWingWheelModel);
-        render(rightWingWheelModel);
+        //render(leftWingWheelModel);
+        //render(rightWingWheelModel);
         render(tailDoorOpenModel);
         render(tailDoorCloseModel);
         render(rightWingPos1Model);

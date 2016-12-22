@@ -1,5 +1,6 @@
 package astro.planetary.entity;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,7 +63,7 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     }
 
     @SideOnly(Side.CLIENT)
-    public abstract void render();
+    public abstract void render(float f1);
 
     @Override
     public AxisAlignedBB getEntityBoundingBox() {
@@ -100,6 +101,39 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     public void onUpdate()
     {
     	prevAxes = axes;
+    	prevPosX = posX;
+    	prevPosY = posY;
+    	prevPosZ = posZ;
+    	
+    	/**
+    	throttle = 0F;
+    	turnSpeed.x = 0F;
+    	turnSpeed.y = 0F;
+    	turnSpeed.z = 0F;
+    	translate = new Vector3f(0,0,0);
+    	axes = new RotatedAxes(0,0,0);
+    	*/
+    	axes.rotateGlobalYaw(turnSpeed.x);
+    	axes.rotateGlobalPitch(turnSpeed.y);
+    	axes.rotateGlobalRoll(turnSpeed.z);
+    	Vector3f axis = axes.getXAxis();
+    	axis.normalise();
+    	axes.rotateGlobalRoll(180F);
+    	Vector3f move = new Vector3f(throttle,0,0);    
+    	Vector3f.add(move, translate, move);
+    	move = axes.findLocalVectorGlobally(move);
+
+    	this.motionX = move.x;
+    	this.motionY = move.y;
+    	this.motionZ = move.z;
+    	axes.rotateGlobalRoll(-180F);
+    	
+    	this.posX += motionX;
+    	this.posY += motionY;
+    	this.posZ += motionZ;
+    	this.motionX = 0;
+    	this.motionY = 0;
+    	this.motionZ = 0;
     }
 
     //Don't bother with this, we want to use the rotation matrix to handle orientation
