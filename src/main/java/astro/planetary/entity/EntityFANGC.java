@@ -4,6 +4,8 @@ import astro.planetary.Planetary;
 import astro.planetary.client.model.ship.ModelFangC;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -30,4 +32,28 @@ public class EntityFANGC extends EntitySpaceShip {
         ModelFangC.MODEL.render(this, 0, 0, 0, 0, 0, 1.0f);
         GlStateManager.popMatrix();
     }
+
+	@Override
+	public void onMouseMoved(int deltaX, int deltaY) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean pressKey(int key, EntityPlayer player) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Entity getControllingEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isDead() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

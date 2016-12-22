@@ -14,13 +14,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+
+import astro.planetary.RotatedAxes;
+import astro.planetary.api.IControllable;
+import astro.planetary.client.vector.Vector3f;
+
 import java.util.List;
 
-public abstract class EntitySpaceShip extends Entity {
+public abstract class EntitySpaceShip extends Entity implements IControllable{
     private float momentum;
-    private double shipPitch;
-    private double shipYaw;
-    private double shipRoll;
+    //Replace yaw, roll and pitch with one set of rotated axes
+    public RotatedAxes axes;
+    //Additional set of axes for smoothness
+    public RotatedAxes prevAxes;
     private double lerpY;
     private double lerpZ;
     private double lerpXRot;
@@ -29,9 +35,24 @@ public abstract class EntitySpaceShip extends Entity {
     private boolean forwardInputDown;
     private boolean backInputDown;
     private float deltaRotation;
+    
+    //Control variables;
+    public float throttle = 0;
+    public Vector3f turnSpeed = new Vector3f(0,0,0); //Yaw, Pitch, Roll
+    
+    //Control boundaries
+    public float maxThrottle = 1; 
+    public Vector3f maxTurnSpeed = new Vector3f(1,1,1); //Yaw, Pitch, Roll
+    public float acceleration = 0.01F;
+    public Vector3f turnRates = new Vector3f (0.01F,0.01F,0.01F); //Yaw, Pitch, Roll
+    
+    //Additional variables for translation in space
+    public Vector3f translate = new Vector3f(0,0,0);
 
     public EntitySpaceShip(World worldIn) {
         super(worldIn);
+        axes = new RotatedAxes(0,0,0);
+        prevAxes = axes;
     }
 
     @Nullable
@@ -72,15 +93,23 @@ public abstract class EntitySpaceShip extends Entity {
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound) {
-
+    	
+    }
+    
+    @Override
+    public void onUpdate()
+    {
+    	prevAxes = axes;
     }
 
+    //Don't bother with this, we want to use the rotation matrix to handle orientation
+    /**
     @SideOnly(Side.CLIENT)
     @Override
     public void applyOrientationToEntity(Entity entityToUpdate) {
         this.applyYawToEntity(entityToUpdate);
     }
-
+   
     protected void applyYawToEntity(Entity entityToUpdate) {
         entityToUpdate.setRenderYawOffset(this.rotationYaw);
         float f = MathHelper.wrapDegrees(entityToUpdate.rotationYaw - this.rotationYaw);
@@ -89,7 +118,11 @@ public abstract class EntitySpaceShip extends Entity {
         entityToUpdate.rotationYaw += f1 - f;
         entityToUpdate.setRotationYawHead(entityToUpdate.rotationYaw);
     }
+    */
 
+    
+    //I reject your boat physics and substitute my own
+    /**
     private void controlBoat() {
         if (this.isBeingRidden()) {
             float f = 0.0F;
@@ -121,6 +154,7 @@ public abstract class EntitySpaceShip extends Entity {
         }
     }
     
+    */
     //For some reason math.clamp won't work, so I made my own function with blackjack and hookers. -Proto
     public float clamp(float var, float min, float max)
     {
@@ -141,6 +175,8 @@ public abstract class EntitySpaceShip extends Entity {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    //Commenting this out so it can be replaced with something more substantial
+    /**
     @SideOnly(Side.CLIENT)
     public void updateInputs(boolean leftInputDown, boolean rightInputDown, boolean forwardInputDown, boolean backInputDown) {
         this.leftInputDown = leftInputDown;
@@ -148,6 +184,78 @@ public abstract class EntitySpaceShip extends Entity {
         this.forwardInputDown = forwardInputDown;
         this.backInputDown = backInputDown;
     }
+    */
+    
+    @Override
+	public boolean pressKey(int key, EntityPlayer player)
+	{
+
+		switch(key)
+		{
+			case 0 : //Accelerate : Increase the throttle, up to 1.
+			{
+				if(throttle < maxThrottle) throttle += 0.01F;
+				return true;
+			}
+			case 1 : //Decelerate : Decrease the throttle, down to -1, or 0 if the vehicle cannot reverse
+			{
+				if(throttle > -maxThrottle) throttle -= 0.01F;
+				return true;
+			}
+			case 2 : //Left : Yaw the craft left
+			{
+				if(turnSpeed.x > -maxTurnSpeed.x) turnSpeed.x -= turnRates.x;
+				return true;
+			}
+			case 3 : //Right : Yaw the craft right
+			{
+				if(turnSpeed.x < maxTurnSpeed.x) turnSpeed.x += turnRates.x;
+				return true;
+			}
+			case 4 : //Up : Pitch up
+			{
+				if(turnSpeed.y < maxTurnSpeed.y) turnSpeed.y += turnRates.y;				
+				return true;
+			}
+			case 5 : //Down : Pitch down
+			{
+				if(turnSpeed.y > -maxTurnSpeed.y) turnSpeed.y -= turnRates.y;
+				return true;
+			}
+			case 6 : //Exit : Get out
+			{
+				player.dismountRidingEntity();
+          		return true;
+			}
+			case 7 : //Inventory
+			{
+				return true;
+			}
+			case 8 : //Change control mode : Do nothing
+			{
+				return true;
+			}
+			case 9 : //Roll left : Do nothing
+			{
+				if(turnSpeed.z > -maxTurnSpeed.z) turnSpeed.z -= turnRates.z;
+				return true;
+			}
+			case 10 : //Roll right : Do nothing
+			{
+				if(turnSpeed.z < maxTurnSpeed.z) turnSpeed.z += turnRates.z;	
+				return true;
+			}
+			case 11 : // Gear : Do nothing
+			{
+				return true;
+			}
+
+		}
+		return false;
+		
+
+	}
+
 
     @Override
     public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
@@ -163,6 +271,12 @@ public abstract class EntitySpaceShip extends Entity {
         TAKING_OFF,
         LANDING,
         IN_FLIGHT
+    }
+    
+    public enum FlightMode {
+    	CONVENTIONAL,
+    	VTOL,
+    	SIXDOF
     }
 
     @Override
