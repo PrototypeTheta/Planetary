@@ -119,11 +119,8 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     	translate = new Vector3f(0,0,0);
     	axes = new RotatedAxes(0,0,0);
     	*/
-    	throttle = 0F;
-    	turnSpeed.y = 0F;
-    	turnSpeed.z = 10;
     	axes.rotateLocalYaw(turnSpeed.x);
-    	axes.rotateLocalPitch(turnSpeed.y);
+    	axes.rotateLocalPitch(-turnSpeed.y);
     	axes.rotateLocalRoll(turnSpeed.z);
     	Vector3f axis = axes.getXAxis();
     	axis.normalise();
@@ -153,11 +150,11 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     	engine1 = axes.findLocalVectorGlobally(engine1);
     	Vector3f engine2 = new Vector3f(-150/16F, -24/16F, -24/16F);
     	engine2 = axes.findLocalVectorGlobally(engine2);
-    	Vector3f a = new Vector3f(-throttle + motionX,(float)Math.random()*0.1 + motionY, (float)Math.random()*0.1 + motionZ);
-    	a = axes.findGlobalVectorLocally(a);
+    	Vector3f a = new Vector3f(-throttle,(float)Math.random()*0.1, (float)Math.random()*0.1);
+    	a = axes.findLocalVectorGlobally(a);
     	axes.rotateGlobalRoll(-180F);
-    	this.worldObj.spawnParticle(EnumParticleTypes.CLOUD, posX + engine1.x, posY + engine1.y, posZ + engine1.z, a.x, a.y, a.z);
-       	this.worldObj.spawnParticle(EnumParticleTypes.CLOUD, posX + engine2.x, posY + engine2.y, posZ + engine2.z, a.x, a.y, a.z);
+    	this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, posX + engine1.x, posY + engine1.y, posZ + engine1.z, a.x, a.y, a.z);
+       	this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, posX + engine2.x, posY + engine2.y, posZ + engine2.z, a.x, a.y, a.z);
 
     }
 
