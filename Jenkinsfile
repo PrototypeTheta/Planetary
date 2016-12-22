@@ -4,10 +4,11 @@ node {
         sh 'rm -rf build/libs/'
     }
     stage('Build') {
+        sh 'chmod +x gradlew'
         sh './gradlew build'
     }
     stage('Deploy') {
         currentBuild.result == 'SUCCESS'
-        archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+            archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
     }
 }
