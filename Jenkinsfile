@@ -4,7 +4,7 @@ node {
         sh 'rm -rf build/libs/'
     }
     stage('Build') {
-        sh 'gradlew build'
+        sh './gradlew build'
     }
     stage('Deploy') {
         currentBuild.result == 'SUCCESS'
