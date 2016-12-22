@@ -228,7 +228,7 @@ public abstract class EntitySpaceShip extends Entity implements IControllable{
     }
     
     */
-    //For some reason math.clamp won't work, so I made my own function with blackjack and hookers. -Proto
+    //For some reason math.clamp won't work, so I made my own function with blackjack and hookers
     public float clamp(float var, float min, float max)
     {
     	if(var > max) var = max;
