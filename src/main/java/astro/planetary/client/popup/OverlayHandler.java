@@ -172,7 +172,7 @@ public enum OverlayHandler {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void renderWorld(RenderWorldLastEvent event) {
-        World world = Minecraft.getMinecraft().world;
+        World world = Minecraft.getMinecraft().theWorld;
         if(world == null)
             return;
         Entity camera = Minecraft.getMinecraft().getRenderViewEntity();

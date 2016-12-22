@@ -52,7 +52,7 @@ public class CustomTeleporter extends Teleporter {
         if (oldDimension == 1) {
             // For some reason teleporting out of the end does weird things.
             player.setPositionAndUpdate(x, y, z);
-            worldServer.spawnEntity(player);
+            worldServer.spawnEntityInWorld(player);
             worldServer.updateEntityWithOptionalForce(player, false);
         }
     }
